@@ -1,21 +1,41 @@
-#!/bin/sh
+#!/usr/bin/env sh
+## Calculates the result of performing a specified mathematical calculation.
 #
-# Calculates the result of a specified mathematical calculation.
+# Somewhat irrelevant notes:
 #
-# Somewhat irrelevant note: 355/113 gives the value of pi accurate to 6
-# digits after the decimal point; 22/7 is accurate to 2 digits after the
-# decimal point.
+#  - 355/113 gives the value of pi accurate to 6 digits after the decimal
+#    point
+#     - 22/7 is accurate to 2 digits after the decimal point
+#  - 239/169 gives the value of the square root of 2 accurate to 4 digits
+#    after the decimal point
+#     - 19601/13860 is accurate to 8 digits after the decimal point
 #
-# Author: James MacKay
+# Source for all of the above: http://wilsonminesco.com/16bitMathTables/
 #
+# Copyright (C) 2011 (or even earlier) by James MacKay
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+#set -x
 
-PROG=$(basename "$0")
+PROG="$(basename "$0")"
 DEFAULT_SCALE=2
 
 
 if [ $# -eq 0 ]
 then
-    cat >&2 <<EOF
+    cat >&2 << +++EOF+++
 
 usage: $PROG expr
 
@@ -23,16 +43,44 @@ where 'expr' is the expression whose value is to be calculated.
 (It can consist of one or more words.)
 
 In the result, the number of decimal digits after the decimal
-point is given by the 'SCALE' environment variable if it's
-defined, and if it isn't then it defaults to ${DEFAULT_SCALE}.
-So for example,
+point is given by the the 'sc' environment variable if it's
+defined, or the 'CALC_SCALE' environment variable if it's
+defined: otherwise it defaults to ${DEFAULT_SCALE}. So for
+example, both of the commands
 
-    SCALE=8 $PROG 355 / 113
+    sc=8 $PROG 355 / 113
+    CALC_SCALE=8 $PROG 355 / 113
 
 outputs 3.14159292 instead of just 3.14.
 
-EOF
++++EOF+++
     exit 1
 fi
 
-echo "scale=${SCALE:-$DEFAULT_SCALE}; $*" | tr 'x' '*' | bc
+# If our basename is of the form n=, nn= or nnn=, where each 'n' is any
+# digit, then unless overridden by setting the 'sc' environment variable or
+# the 'sc' or 'CALC_SCALE' environment variables on the command line the
+# number of decimal digits will be the number 'n', 'nn' or 'nnn'.
+#echo "PROG=$PROG"
+case "$PROG" in
+    [[:digit:]]=)
+        #echo "matched one digit"
+        CALC_SCALE="${PROG:0:1}"
+        ;;
+    [[:digit:]][[:digit:]]=)
+        CALC_SCALE="${PROG:0:2}"
+        ;;
+    [[:digit:]][[:digit:]][[:digit:]]=)
+        CALC_SCALE="${PROG:0:3}"
+        ;;
+esac
+#[ -n "$CALC_SCALE" ] && echo "Initial CALC_SCALE=${CALC_SCALE}"
+
+# The scale/number of decimal places can be overridden using either
+# 'CALC_SCALE' or 'sc': the latter is quicker when overriding it for one
+# command while the former is probably more suited to setting it more
+# permanently.
+echo "scale=${sc:-${CALC_SCALE:-$DEFAULT_SCALE}}; $*" | \
+    #sed 's_pi_4\*a\(1\)_g' | \  # wrong (3.12) for small SCALEs
+    #sed 's_pi_3.14159265358979323846_g' | \  # forces scale to 20 digits
+    tr 'x' '*' | bc #-l
