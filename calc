@@ -75,12 +75,39 @@ case "$PROG" in
         ;;
 esac
 #[ -n "$CALC_SCALE" ] && echo "Initial CALC_SCALE=${CALC_SCALE}"
+declare -i SCALE="${sc:-${CALC_SCALE:-$DEFAULT_SCALE}}"
+
+# Calculate pi to the number of digits we'll need: we don't use too many
+# since too many decimal digits will increase the number of decimal digits
+# in the final answer.
+#
+# Note: we could do this with the value of 'e' too, except then 'e' and
+# 'e(1)' (aka 'exp(1)') would have different values.
+#
+# FUTURE: round the final value of PI rather instead of truncating it.
+PI="$(echo "scale=$((SCALE+2)); 4*a(1)" | bc -l)"
+PI="${PI:0: -2}"  # space required
+#echo "PI=$PI"
 
 # The scale/number of decimal places can be overridden using either
 # 'CALC_SCALE' or 'sc': the latter is quicker when overriding it for one
 # command while the former is probably more suited to setting it more
 # permanently.
-echo "scale=${sc:-${CALC_SCALE:-$DEFAULT_SCALE}}; $*" | \
-    #sed 's_pi_4\*a\(1\)_g' | \  # wrong (3.12) for small SCALEs
-    #sed 's_pi_3.14159265358979323846_g' | \  # forces scale to 20 digits
-    tr 'x' '*' | bc #-l
+#
+# The 'sed' command allows us to use the standard names for some common
+# mathematical functions and constants in place of bc's 1-letter names for
+# them. It's probably not a good idea to keep adding more expressions to the
+# command since they can easily interact badly with each other. As it is if
+# we put the expression for 'sin' before the one for 'cos' then 'cosin(...)'
+# would get converted to 'cos(...)' (and then to 'c(...)'), which isn't a
+# huge deal but does effectively define a function that we didn't really
+# intend to (and don't particularly want to). And not all interactions will
+# be as benign, or as easily remedied.
+#
+# (Also note that it's crucial that the 'sed' command precede the 'tr'
+# command so that the latter doesn't convert the 'x' in 'exp(...)' into '*'.)
+echo "$*" | sed -e "s_pi_${PI}_g" \
+    -e 's_cos(_c(_g' -e 's_sin(_s(_g' -e 's_atan(_a(_g' \
+    -e 's_e$_e(1)_g' -e 's_e\([^(]\)_e(1)\1_g' \
+    -e 's_ln(_l(_g' -e 's_exp(_e(_g' | \
+    tr 'x' '*' | sed "s_^_scale=$SCALE; _" | bc -l
