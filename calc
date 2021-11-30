@@ -18,4 +18,4 @@ EOF
     exit 1
 fi
 
-echo "scale=2; $*" | bc
+echo "scale=2; $*" | tr 'x' '*' | bc
