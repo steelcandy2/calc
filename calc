@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# Calculates the result of a specified mathematical calculation.
+#
+# Author: James MacKay
+#
+
+if [ $# -eq 0 ]
+then
+    cat >&2 <<EOF
+
+usage: $(basename $0) expr
+
+where 'expr' is the expression whose value is to be calculated.
+(It can consist of one or more words.)
+
+EOF
+    exit 1
+fi
+
+echo "scale=2; $*" | bc
