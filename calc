@@ -2,20 +2,37 @@
 #
 # Calculates the result of a specified mathematical calculation.
 #
+# Somewhat irrelevant note: 355/113 gives the value of pi accurate to 6
+# digits after the decimal point; 22/7 is accurate to 2 digits after the
+# decimal point.
+#
 # Author: James MacKay
 #
+
+PROG=$(basename "$0")
+DEFAULT_SCALE=2
+
 
 if [ $# -eq 0 ]
 then
     cat >&2 <<EOF
 
-usage: $(basename $0) expr
+usage: $PROG expr
 
 where 'expr' is the expression whose value is to be calculated.
 (It can consist of one or more words.)
+
+In the result, the number of decimal digits after the decimal
+point is given by the 'SCALE' environment variable if it's
+defined, and if it isn't then it defaults to ${DEFAULT_SCALE}.
+So for example,
+
+    SCALE=8 $PROG 355 / 113
+
+outputs 3.14159292 instead of just 3.14.
 
 EOF
     exit 1
 fi
 
-echo "scale=2; $*" | tr 'x' '*' | bc
+echo "scale=${SCALE:-$DEFAULT_SCALE}; $*" | tr 'x' '*' | bc
