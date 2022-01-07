@@ -51,7 +51,7 @@ example, both of the commands
     sc=8 $PROG 355 / 113
     CALC_SCALE=8 $PROG 355 / 113
 
-outputs 3.14159292 instead of just 3.14.
+output 3.14159292 instead of just 3.14.
 
 +++EOF+++
     exit 1
