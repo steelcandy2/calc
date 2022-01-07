@@ -1,0 +1,21 @@
+#+title: calc
+#+date: <2022-01-07 Fri 15:15>
+#+description: README file for the 'calc' program.
+
+=usage: calc expr=
+
+where 'expr' is the expression whose value is to be calculated.
+(It can consist of one or more words.)
+
+In the result, the number of decimal digits after the decimal
+point is given by the the 'sc' environment variable if it's
+defined, or the 'CALC_SCALE' environment variable if it's
+defined: otherwise it defaults to 2. So for example, both of
+the commands
+
+#+begin_example
+sc=8 = 355 / 113
+CALC_SCALE=8 = 355 / 113
+#+end_example
+
+output 3.14159292 instead of just 3.14.
