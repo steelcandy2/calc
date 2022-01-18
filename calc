@@ -1,5 +1,8 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 ## Calculates the result of performing a specified mathematical calculation.
+#
+# Note: in some cases intermediate and final values will be truncated when
+# one might expect them to be rounded instead.
 #
 # Somewhat irrelevant notes:
 #
