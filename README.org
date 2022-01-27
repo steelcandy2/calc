@@ -2,7 +2,7 @@
 #+date: <2022-01-07 Fri 15:15>
 #+description: README file for the 'calc' program.
 
-This is a simple bash shell script that provides a simple command line
+This is a small bash shell script that provides a simple command line
 calculator.
 
 Below is the formal documentation (and usage message) for the =calc= script.
