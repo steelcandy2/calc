@@ -2,6 +2,13 @@
 #+date: <2022-01-07 Fri 15:15>
 #+description: README file for the 'calc' program.
 
+This is a simple bash shell script that provides a simple command line
+calculator.
+
+Below is the formal documentation (and usage message) for the =calc= script.
+See the corresponding [[https://blog0.steelcandy.org/2021-11-02-calculating-on-the-command-line.html][blog post]] for a more informal and expansive
+introduction to the program.
+
 =usage: calc expr=
 
 where 'expr' is the expression whose value is to be calculated.
